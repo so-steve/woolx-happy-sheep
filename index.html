@@ -84,6 +84,7 @@
     }
     .overlay.show {
       opacity: 1;
+      pointer-events: all;
     }
   </style>
 </head>
@@ -96,7 +97,7 @@
     <video id="happyVideo" src="2.mp4" muted playsinline></video>
   </div>
 
-  <div class="overlay" id="overlay">Congrats, you made the sheep happy! You win 20% off 🐑</div>
+  <div class="overlay" id="overlay"><div>Congrats, you made the sheep happy! You win 20% off 🐑</div></div>
 
   <script>
     const idleVideo = document.getElementById('idleVideo');
@@ -108,6 +109,8 @@
     let lastY = null;
     let wiggleCount = 0;
     let alreadyWon = false;
+    let overlayTriggered = false;
+    let happyPlayed = false;
     const WIGGLE_THRESHOLD = 30;
 
     function showVideo(showEl, hideEl) {
@@ -129,7 +132,7 @@
         setTimeout(() => sparkle.remove(), 500);
       }
 
-      if (!isPetting || lastX === null || lastY === null) return;
+      if (!isPetting || lastX === null || lastY === null || happyPlayed) return;
 
       const dx = e.clientX - lastX;
       const dy = e.clientY - lastY;
@@ -141,11 +144,20 @@
         lastY = e.clientY;
 
         if (wiggleCount >= WIGGLE_THRESHOLD && !alreadyWon) {
+          happyPlayed = true;
           showVideo(happyVideo, idleVideo);
-          happyVideo.onended = () => {
-            overlay.classList.add('show');
-            alreadyWon = true;
-          };
+          happyVideo.loop = false;
+          happyVideo.currentTime = 0;
+          happyVideo.play();
+
+          happyVideo.addEventListener('timeupdate', () => {
+            if (!overlayTriggered && happyVideo.duration - happyVideo.currentTime < 0.8) {
+              overlay.classList.add('show');
+              overlayTriggered = true;
+              alreadyWon = true;
+            }
+          });
+
           wiggleCount = 0;
         }
 
@@ -168,11 +180,6 @@
       lastX = null;
       lastY = null;
       clearTimeout(resetTimer);
-      resetTimer = setTimeout(() => {
-        if (!alreadyWon && happyVideo.classList.contains('active')) {
-          showVideo(idleVideo, happyVideo);
-        }
-      }, 1500);
     });
   </script>
 
