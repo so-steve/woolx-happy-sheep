@@ -1,187 +1,213 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pet the Sheep</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      background: black;
-      overflow: hidden;
-      font-family: 'Poppins', sans-serif;
-    }
-    .video-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    video {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.8s ease-in-out;
-      pointer-events: none;
-    }
-    video.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .cursor {
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      background: white;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-    }
-    .sparkle {
-      position: fixed;
-      width: 6px;
-      height: 6px;
-      background: yellow;
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      animation: sparkle 0.5s linear forwards;
-    }
-    @keyframes sparkle {
-      to {
-        transform: translate(-50%, -50%) scale(0.5);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pet the Sheep</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        background: url("1.png") no-repeat center center;
+        background-size: cover;
+        overflow: hidden;
+        font-family: "Poppins", sans-serif;
+      }
+      .video-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      video {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        pointer-events: none;
       }
-    }
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #489f96;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 2rem;
-      font-weight: 600;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 10000;
-      transition: opacity 1s ease;
-    }
-    .overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-  </style>
-</head>
-<body>
+      video.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .cursor {
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+      }
+      .sparkle {
+        position: fixed;
+        width: 6px;
+        height: 6px;
+        background: yellow;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        animation: sparkle 0.5s linear forwards;
+      }
+      @keyframes sparkle {
+        to {
+          transform: translate(-50%, -50%) scale(0.5);
+          opacity: 0;
+        }
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #489f96;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        font-weight: 600;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 10000;
+        transition: opacity 1s ease;
+      }
+      .overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .claim-btn {
+        margin-top: 20px;
+        padding: 12px 24px;
+        font-size: 1rem;
+        background-color: white;
+        color: #489f96;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cursor" id="cursor"></div>
 
-  <div class="cursor" id="cursor"></div>
+    <div class="video-container">
+      <video
+        id="idleVideo"
+        src="1.mp4"
+        autoplay
+        loop
+        muted
+        playsinline
+        class="active"
+      ></video>
+      <video id="happyVideo" src="2.mp4" muted playsinline></video>
+    </div>
 
-  <div class="video-container">
-    <video id="idleVideo" src="1.mp4" autoplay loop muted playsinline class="active"></video>
-    <video id="happyVideo" src="2.mp4" muted playsinline></video>
-  </div>
+    <div class="overlay" id="overlay">
+      <div>Congrats, you made the sheep happy! You win 20% off 🐑</div>
+      <button class="claim-btn">Claim your discount</button>
+    </div>
 
-  <div class="overlay" id="overlay"><div>Congrats, you made the sheep happy! You win 20% off 🐑</div></div>
+    <script>
+      const idleVideo = document.getElementById("idleVideo");
+      const happyVideo = document.getElementById("happyVideo");
+      const cursor = document.getElementById("cursor");
+      const overlay = document.getElementById("overlay");
+      let isPetting = false;
+      let lastX = null;
+      let lastY = null;
+      let wiggleCount = 0;
+      let alreadyWon = false;
+      let overlayTriggered = false;
+      let happyPlayed = false;
+      const WIGGLE_THRESHOLD = 30;
 
-  <script>
-    const idleVideo = document.getElementById('idleVideo');
-    const happyVideo = document.getElementById('happyVideo');
-    const cursor = document.getElementById('cursor');
-    const overlay = document.getElementById('overlay');
-    let isPetting = false;
-    let lastX = null;
-    let lastY = null;
-    let wiggleCount = 0;
-    let alreadyWon = false;
-    let overlayTriggered = false;
-    let happyPlayed = false;
-    const WIGGLE_THRESHOLD = 30;
-
-    function showVideo(showEl, hideEl) {
-      hideEl.classList.remove("active");
-      showEl.classList.add("active");
-      showEl.play();
-    }
-
-    document.addEventListener('mousemove', e => {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top = e.clientY + 'px';
-
-      if (isPetting) {
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        sparkle.style.left = e.clientX + 'px';
-        sparkle.style.top = e.clientY + 'px';
-        document.body.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 500);
+      function showVideo(showEl, hideEl) {
+        hideEl.classList.remove("active");
+        showEl.classList.add("active");
+        showEl.play();
       }
 
-      if (!isPetting || lastX === null || lastY === null || happyPlayed) return;
+      document.addEventListener("mousemove", (e) => {
+        cursor.style.left = e.clientX + "px";
+        cursor.style.top = e.clientY + "px";
 
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance > 15) {
-        wiggleCount++;
-        lastX = e.clientX;
-        lastY = e.clientY;
-
-        if (wiggleCount >= WIGGLE_THRESHOLD && !alreadyWon) {
-          happyPlayed = true;
-          showVideo(happyVideo, idleVideo);
-          happyVideo.loop = false;
-          happyVideo.currentTime = 0;
-          happyVideo.play();
-
-          happyVideo.addEventListener('timeupdate', () => {
-            if (!overlayTriggered && happyVideo.duration - happyVideo.currentTime < 0.8) {
-              overlay.classList.add('show');
-              overlayTriggered = true;
-              alreadyWon = true;
-            }
-          });
-
-          wiggleCount = 0;
+        if (isPetting) {
+          const sparkle = document.createElement("div");
+          sparkle.className = "sparkle";
+          sparkle.style.left = e.clientX + "px";
+          sparkle.style.top = e.clientY + "px";
+          document.body.appendChild(sparkle);
+          setTimeout(() => sparkle.remove(), 500);
         }
 
+        if (!isPetting || lastX === null || lastY === null || happyPlayed)
+          return;
+
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance > 15) {
+          wiggleCount++;
+          lastX = e.clientX;
+          lastY = e.clientY;
+
+          if (wiggleCount >= WIGGLE_THRESHOLD && !alreadyWon) {
+            happyPlayed = true;
+            showVideo(happyVideo, idleVideo);
+            happyVideo.loop = false;
+            happyVideo.currentTime = 0;
+            happyVideo.play();
+
+            setTimeout(() => {
+              if (!overlayTriggered) {
+                overlay.classList.add("show");
+                overlayTriggered = true;
+                alreadyWon = true;
+              }
+            }, 2000); // Show overlay after 2 seconds
+
+            wiggleCount = 0;
+          }
+
+          clearTimeout(resetTimer);
+        }
+      });
+
+      let resetTimer;
+
+      document.addEventListener("mousedown", (e) => {
+        if (e.button !== 0) return;
+        isPetting = true;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        wiggleCount = 0;
+      });
+
+      document.addEventListener("mouseup", () => {
+        isPetting = false;
+        lastX = null;
+        lastY = null;
         clearTimeout(resetTimer);
-      }
-    });
-
-    let resetTimer;
-
-    document.addEventListener('mousedown', e => {
-      if (e.button !== 0) return;
-      isPetting = true;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      wiggleCount = 0;
-    });
-
-    document.addEventListener('mouseup', () => {
-      isPetting = false;
-      lastX = null;
-      lastY = null;
-      clearTimeout(resetTimer);
-    });
-  </script>
-
-</body>
+      });
+    </script>
+  </body>
 </html>
